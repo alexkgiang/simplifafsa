@@ -3,7 +3,7 @@ const User = require('./user');
 const Match = require('./match')
 
 const match = new Match();
-const user = new User("John", "Doe", "cheesegamerisabella@gmail.com", "5162542654", "123 Main St, Anytown, USA", "/path/to/resume.pdf");
+const user = new User("John", "Doe", "cheesegamerisabella@gmail.com", "5162542654", "mobile", "123 Main St, Anytown, USA", "united states", "/path/to/resume.pdf", "https://www.linkedin.com/in/alex-giange/");
 
 //fills out an entire form
 
@@ -15,8 +15,18 @@ async function handleInput(page, fieldName) {
   var response;
   const element = await page.$(`[name="${fieldName}"]`);
   if (element !== null) {
-      response = await match.fillField(user, fieldName)
+      response = await match.fillInputField(user, fieldName)
       await page.type(`input[name="${fieldName}"]`, response);
+      await sleep(1000);
+  }
+}
+
+async function handleSelect(page, fieldName) {
+  var response;
+  const element = await page.$(`[name="${fieldName}"]`);
+  if (element !== null) {
+      response = await match.fillSelectField(user, fieldName)
+      await page.select(`[name="${fieldName}"]`, response);
       await sleep(1000);
   }
 }
@@ -42,6 +52,10 @@ async function handleInput(page, fieldName) {
 
   for (const field of inputFields) {
     await handleInput(page, field);
+  }
+
+  for (const field of selectFields) {
+    await handleSelect(page, field);
   }
 
   await browser.close();

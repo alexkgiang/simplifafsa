@@ -34,7 +34,7 @@ class Match {
     ];
   }
 
-  async fillField(user, inputField) {
+  async fillInputField(user, inputField) {
     const prompt = this.createPrompt(user, inputField);
 
     // const prompt = new PromptTemplate({
@@ -65,22 +65,37 @@ class Match {
       return error;
     }
   }
-}
 
-async function run() {
+  async fillSelectField(user, selectField) {
+    const prompt = this.createPrompt(user, selectField);
 
-  const match = new Match();
-  const user = new User("John", "Doe", "cheesegamerisabella@gmail.com", "5162542654", "123 Main St, Anytown, USA", "/path/to/resume.pdf");
-
-  try {
-    const response = await match.fillField(user, "firstname");
-    console.log("Response:", response);
-  } catch (error) {
-    console.error("Error:", error);
+    try {
+      const response = await this.openai.createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: prompt,
+      });
+      const assistantResponse = response.data.choices[0].message.content;
+      return assistantResponse;
+    } catch (error) {
+      return error;
+    }
   }
 }
 
-run();
+// async function run() {
+
+//   const match = new Match();
+//   const user = new User("John", "Doe", "cheesegamerisabella@gmail.com", "5162542654", "123 Main St, Anytown, USA", "/path/to/resume.pdf");
+
+//   try {
+//     const response = await match.fillInputField(user, "firstname");
+//     console.log("Response:", response);
+//   } catch (error) {
+//     console.error("Error:", error);
+//   }
+// }
+
+// run();
 
 
 module.exports = Match;
