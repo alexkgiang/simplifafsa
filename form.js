@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
-const User = require('./user');
-const Match = require('./match')
+const { user } = require('./user');
+const Match = require('./match');
 
 // const URL = "https://wellfound.com/company/via-transportation/jobs/1841647-strategic-finance-associate?utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic"
 
@@ -10,7 +10,7 @@ class Form {
   /* Fills out an entire form */
   constructor() {
     this.match = new Match();
-    this.user = new User("John", "Doe", "cheesegamerisabella@gmail.com", "5162542654", "mobile", "123 Main St, Anytown, USA", "united states", "/path/to/resume.pdf", "https://www.linkedin.com/in/alex-giange/");
+    this.user = user.toString();
     this.url = URL;
   }
 
