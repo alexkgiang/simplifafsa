@@ -2,61 +2,75 @@ const puppeteer = require('puppeteer');
 const User = require('./user');
 const Match = require('./match')
 
-const match = new Match();
-const user = new User("John", "Doe", "cheesegamerisabella@gmail.com", "5162542654", "mobile", "123 Main St, Anytown, USA", "united states", "/path/to/resume.pdf", "https://www.linkedin.com/in/alex-giange/");
+// const URL = "https://wellfound.com/company/via-transportation/jobs/1841647-strategic-finance-associate?utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic"
 
-//fills out an entire form
+const URL = 'https://www.tesla.com/careers/search/job/apply/117786';
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+class Form {
+  /* Fills out an entire form */
+  constructor() {
+    this.match = new Match();
+    this.user = new User("John", "Doe", "cheesegamerisabella@gmail.com", "5162542654", "mobile", "123 Main St, Anytown, USA", "united states", "/path/to/resume.pdf", "https://www.linkedin.com/in/alex-giange/");
+    this.url = URL;
+  }
 
-async function handleInput(page, fieldName) {
-  var response;
-  const element = await page.$(`[name="${fieldName}"]`);
-  if (element !== null) {
-      response = await match.fillInputField(user, fieldName)
-      await page.type(`input[name="${fieldName}"]`, response);
-      await sleep(1000);
+  async sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async handleInput(page, fieldName) {
+    var response;
+    const element = await page.$(`[name="${fieldName}"]`);
+    if (element !== null) {
+        response = await this.match.fillInputField(this.user, fieldName)
+        await page.type(`input[name="${fieldName}"]`, response);
+        await this.sleep(1000);
+    }
+  }
+
+  async handleSelect(page, fieldName) {
+    var response;
+    const element = await page.$(`[name="${fieldName}"]`);
+    if (element !== null) {
+        response = await this.match.fillSelectField(this.user, fieldName)
+        await page.select(`[name="${fieldName}"]`, response);
+        await this.sleep(1000);
+    }
+  }
+
+  async main() {
+    const browser = await puppeteer.launch({headless: false});
+    const page = await browser.newPage();
+
+    await page.goto(this.url, { waitUntil: 'networkidle2' });
+
+    const inputFields = await page.$$eval('input', fields =>
+      fields.map(field => field.name)
+    );
+
+    const selectFields = await page.$$eval('select', fields =>
+      fields.map(field => field.name)
+    );
+
+    const buttonFields = await page.$$eval('button', fields =>
+      fields.map(field => field.name)
+    );
+
+    for (const field of inputFields) {
+      await this.handleInput(page, field);
+    }
+
+    for (const field of selectFields) {
+      await this.handleSelect(page, field);
+    }
+
+    await browser.close();
   }
 }
 
-async function handleSelect(page, fieldName) {
-  var response;
-  const element = await page.$(`[name="${fieldName}"]`);
-  if (element !== null) {
-      response = await match.fillSelectField(user, fieldName)
-      await page.select(`[name="${fieldName}"]`, response);
-      await sleep(1000);
-  }
+async function run() {
+  const form = new Form();
+  form.main();
 }
 
-(async () => {
-  const browser = await puppeteer.launch({headless: false});
-  const page = await browser.newPage();
-
-  const url = 'https://www.tesla.com/careers/search/job/apply/117786';
-  await page.goto(url, { waitUntil: 'networkidle2' });
-
-  const inputFields = await page.$$eval('input', fields =>
-    fields.map(field => field.name)
-  );
-
-  const selectFields = await page.$$eval('select', fields =>
-    fields.map(field => field.name)
-  );
-
-  const buttonFields = await page.$$eval('button', fields =>
-    fields.map(field => field.name)
-  );
-
-  for (const field of inputFields) {
-    await handleInput(page, field);
-  }
-
-  for (const field of selectFields) {
-    await handleSelect(page, field);
-  }
-
-  await browser.close();
-})();
+run();

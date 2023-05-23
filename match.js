@@ -26,7 +26,7 @@ class Match {
 
   createPrompt(user, inputField) {
     let context = `The user is filling a form. The current field is "${inputField}". The user information is as follows: ${JSON.stringify(user)}.`;
-    let question = `What should the user enter in the "${inputField}" field? Respond with one word and no punctuation.`;
+    let question = `What should the user enter in the "${inputField}" field? Respond with one word, or if the output is not a word, then one item.`;
 
     return [
       { role: "system", content: context },
