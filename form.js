@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const { user } = require('./user');
 const Match = require('./match');
+const MatchL = require('./matchL');
 
 // const URL = "https://wellfound.com/company/via-transportation/jobs/1841647-strategic-finance-associate?utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic"
 
@@ -9,7 +10,7 @@ const URL = 'https://www.tesla.com/careers/search/job/apply/117786';
 class Form {
   /* Fills out an entire form */
   constructor() {
-    this.match = new Match();
+    this.match = new MatchL();
     this.user = user.toString();
     this.url = URL;
   }
@@ -24,7 +25,7 @@ class Form {
     if (element !== null) {
         response = await this.match.fillInputField(this.user, fieldName)
         await page.type(`input[name="${fieldName}"]`, response);
-        await this.sleep(1000);
+        await this.sleep(500);
     }
   }
 
@@ -34,7 +35,7 @@ class Form {
     if (element !== null) {
         response = await this.match.fillSelectField(this.user, fieldName)
         await page.select(`[name="${fieldName}"]`, response);
-        await this.sleep(1000);
+        await this.sleep(500);
     }
   }
 

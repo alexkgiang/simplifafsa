@@ -8,7 +8,7 @@ const { PromptTemplate, ChatMessagePromptTemplate, ChatPromptTemplate, SystemMes
 const { StructuredOutputParser } = require("langchain/output_parsers");
 const { HumanChatMessage, SystemChatMessage } = require("langchain/schema");
 
-class StructuredOutputParser {
+class ExtendedStructuredOutputParser extends StructuredOutputParser {
   getFormatInstructions() {
     return (
       `
@@ -20,11 +20,11 @@ class StructuredOutputParser {
       A phone number would be: 9728443577
       Again, the output should have the answer to the prompt, and nothing else.
       `
-    )
+    );
   }
 
   parse(raw) {
-    // ...
+    return JSON.parse(raw);
   }
 
   parseWithPrompt(text, prompt) {
@@ -39,19 +39,9 @@ class MatchL {
     this.openai = new ChatOpenAI({ modelName: "gpt-3.5-turbo", temperature: 0 });
   }
 
-  createPrompt(user, inputField) {
-    let context = `The user is filling a form. The current field is "${inputField}". The user information is as follows: ${JSON.stringify(user)}.`;
-    let question = `What should the user enter in the "${inputField}" field? Respond with one word, or if the output is not a word, then one item.`;
-
-    return [
-      { role: "system", content: context },
-      { role: "user", content: question }
-    ];
-  }
-
   async fillInputField(user, inputField) {
 
-    const parser = StructuredOutputParser.fromNamesAndDescriptions({
+    const parser = ExtendedStructuredOutputParser.fromNamesAndDescriptions({
       answer: "answer to the user's question",
       source: "source used to answer the user's question",
     });
@@ -77,7 +67,7 @@ class MatchL {
 
     // const parsedResponse = await parser.parse(response)
     
-    return response
+    return response.text
   }
 
   async fillSelectField(user, selectField) {
