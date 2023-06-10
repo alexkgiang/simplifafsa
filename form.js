@@ -1,7 +1,6 @@
 const puppeteer = require('puppeteer');
-const { user } = require('./user');
-const Match = require('./match');
-const MatchL = require('./matchL');
+const { user } = require('./user.js');
+const MatchL = require('./matchL.js');
 
 // const URL = "https://wellfound.com/company/via-transportation/jobs/1841647-strategic-finance-associate?utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic"
 
