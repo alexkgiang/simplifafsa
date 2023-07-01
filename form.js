@@ -22,9 +22,10 @@ class Form {
     var response;
     const element = await page.$(`[name="${fieldName}"]`);
     if (element !== null) {
-        response = await this.match.fillInputField(this.user, fieldName)
-        await page.type(`input[name="${fieldName}"]`, response);
-        await this.sleep(500);
+      //handle file input here
+      response = await this.match.fillInputField(this.user, fieldName)
+      await page.type(`input[name="${fieldName}"]`, response);
+      await this.sleep(1000);
     }
   }
 
