@@ -53,6 +53,23 @@ class SelectStructuredOutputParser extends StructuredOutputParser {
   parseWithPrompt(text, prompt) {}
 }
 
+class TextAreaStructuredOutputParser extends StructuredOutputParser {
+  getFormatInstructions() {
+    return `
+      The output should have the text for the text area field.
+      Text area fields are often used for larger amounts of text, so the output can be a paragraph or multiple sentences.
+      Make sure the output is in line with the field's requirements (e.g. a personal statement, a description, feedback).
+      There should be no unnecessary punctuation, quotes, or any extra output.
+    `;
+  }
+
+  parse(raw) {
+    return JSON.parse(raw);
+  }
+
+  parseWithPrompt(text, prompt) {}
+}
+
 class MatchL {
   /* Matches a field to the appropriate answer based on the user */
   constructor() {
@@ -123,10 +140,40 @@ class MatchL {
   }
 
   async findCorrectFile(user, selectField) {
-    const path = require('path');
-    const filePath = path.resolve(__dirname, 'data', `AlexGiangResume.pdf`);
+    const path = require("path");
+    const filePath = path.resolve(__dirname, "data", `AlexGiangResume.pdf`);
 
     return filePath;
+  }
+
+  async fillTextAreaField(user, inputField) {
+    const parser = TextAreaStructuredOutputParser.fromNamesAndDescriptions({
+      answer: "answer to the user's question",
+      source: "source used to answer the user's question",
+    });
+
+    const formatInstructions = parser.getFormatInstructions();
+
+    const chatPrompt = ChatPromptTemplate.fromPromptMessages([
+      SystemMessagePromptTemplate.fromTemplate(
+        "The user is filling out a form. You are a helpful assistant that helps the user fill out questions. \n{format_instructions}"
+      ),
+      HumanMessagePromptTemplate.fromTemplate(
+        "The current field is {field}. Here is information about the user: \n{user}"
+      ),
+    ]);
+
+    const input = await chatPrompt.format({
+      format_instructions: formatInstructions,
+      field: inputField,
+      user: user.toString(),
+    });
+
+    const response = await this.openai.call([new HumanChatMessage(input)]);
+
+    // const parsedResponse = await parser.parse(response)
+
+    return response.text;
   }
 }
 

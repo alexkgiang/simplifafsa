@@ -28,9 +28,7 @@ class Form {
         await page.type(`input[name="${fieldName}"]`, response);
       }
       else if (fieldType === 'file') {
-        console.log('helo')
         response = await this.match.findCorrectFile(this.user, fieldName);
-        console.log(response)
         await element.uploadFile(response);
       }
     }
@@ -49,7 +47,7 @@ class Form {
   async handleTextarea(page, fieldName) {
     const element = await page.$(`[name="${fieldName}"]`);
     if (element !== null) {
-      const response = await this.match.fillInputField(this.user, fieldName);
+      const response = await this.match.fillTextAreaField(this.user, fieldName);
       await page.type(`textarea[name="${fieldName}"]`, response);
       await this.sleep(500);
     }
